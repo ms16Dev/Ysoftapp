@@ -2,12 +2,15 @@ package com.msan.ysoftapp.navigation
 
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.msan.ysoftapp.R
+import com.msan.ysoftapp.feature.calendar.navegation.CalendarDestination
 import com.msan.ysoftapp.feature.home.navigation.HomeDestination
 
 class YsoftTopLevelNavigation(private val navController: NavHostController) {
@@ -42,5 +45,11 @@ val TOP_LEVEL_DESTINATIONS = listOf(
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home,
         iconTextId = R.string.home
+    ),
+    TopLevelDestination(
+        route = CalendarDestination.route,
+        selectedIcon = Icons.Filled.DateRange,
+        unselectedIcon = Icons.Outlined.DateRange,
+        iconTextId = R.string.calendar
     ),
 )
