@@ -2,9 +2,7 @@ package com.msan.ysoftapp.feature.addassignment
 
 
 import android.app.DatePickerDialog
-import android.content.Context
 import android.widget.DatePicker
-import android.widget.Toast
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -36,13 +34,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,8 +50,6 @@ import androidx.compose.ui.unit.dp
 import com.msan.ysoftapp.R
 import com.msan.ysoftapp.util.Difficulty
 import com.msan.ysoftapp.util.getRecurrenceList
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import java.text.DateFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.*
@@ -69,7 +63,6 @@ fun AddAssignmentRoute(
     AddAssignmentScreen(onBackClicked)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddAssignmentScreen(onBackClicked: () -> Unit) {
     var assignmentName by rememberSaveable { mutableStateOf("") }
@@ -124,7 +117,6 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit) {
             minLines = 3, // Ensures at least 3 lines are visible
             singleLine = false, // Enables multi-line input
             shape = MaterialTheme.shapes.medium, // Optional: adjust the shape
-            colors = TextFieldDefaults.textFieldColors() // Optional: customize colors
         )
         Spacer(modifier = Modifier.padding(4.dp))
         Row(
@@ -185,8 +177,6 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit) {
             style = MaterialTheme.typography.bodyLarge
         )
         var selectedTime by rememberSaveable { mutableStateOf<Difficulty?>(null) }
-        val scope = rememberCoroutineScope()
-        val context = LocalContext.current
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
