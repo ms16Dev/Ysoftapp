@@ -1,6 +1,9 @@
 package com.msan.ysoftapp
 
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
@@ -26,21 +29,25 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.msan.ysoftapp.navigation.DoseNavHost
+import com.msan.ysoftapp.feature.addassignment.navigation.AddAssignmentDestination
 import com.msan.ysoftapp.navigation.YsoftTopLevelNavigation
 import com.msan.ysoftapp.navigation.TOP_LEVEL_DESTINATIONS
 import com.msan.ysoftapp.navigation.TopLevelDestination
+import com.msan.ysoftapp.navigation.YsoftNavHost
 import com.msan.ysoftapp.ui.theme.YsoftappTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -61,18 +68,36 @@ fun YsoftApp() {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
 
+
+            val bottomBarVisibility = rememberSaveable { (mutableStateOf(true)) }
+            val fabVisibility = rememberSaveable { (mutableStateOf(true)) }
+
+
             Scaffold(
                 modifier = Modifier.padding(16.dp),
                 containerColor = Color.Transparent,
                 floatingActionButton = {
-                    YsoftFAB()
+                    AnimatedVisibility(
+                        visible = fabVisibility.value,
+                        enter = slideInVertically(initialOffsetY = { it }),
+                        exit = slideOutVertically(targetOffsetY = { it }),
+                        content = {
+                            YsoftFAB(navController)
+                        })
+
                 },
                 contentColor = MaterialTheme.colorScheme.onBackground,
                 bottomBar = {
-                    YsoftBottomBar(
-                        onNavigateToTopLevelDestination = doseTopLevelNavigation::navigateTo,
-                        currentDestination = currentDestination
-                    )
+                    AnimatedVisibility(
+                        visible = bottomBarVisibility.value,
+                        enter = slideInVertically(initialOffsetY = { it }),
+                        exit = slideOutVertically(targetOffsetY = { it }),
+                        content = {
+                            YsoftBottomBar(
+                                onNavigateToTopLevelDestination = doseTopLevelNavigation::navigateTo,
+                                currentDestination = currentDestination
+                            )
+                        })
                 }
             ) { padding ->
                 Row(
@@ -84,9 +109,9 @@ fun YsoftApp() {
                             )
                         )
                 ) {
-
-
-                    DoseNavHost(
+                    YsoftNavHost(
+                        bottomBarVisibility = bottomBarVisibility,
+                        fabVisibility = fabVisibility,
                         navController = navController,
                         modifier = Modifier
                             .padding(padding)
@@ -138,16 +163,18 @@ private fun YsoftBottomBar(
         }
     }
 }
+
 @Composable
-fun YsoftFAB() {
+fun YsoftFAB(navController: NavController) {
     ExtendedFloatingActionButton(
-        text = { Text(text = "Add Assignment") },
+        text = { Text(text = stringResource(id = R.string.add_assignment)) },
         icon = { Icon(imageVector = Icons.Default.Add, contentDescription = "Add") },
         onClick = {
-            // Navigate to Add Assignment
+            navController.navigate(AddAssignmentDestination.route)
         },
-        elevation = FloatingActionButtonDefaults.elevation(0.dp))
+        elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp))
 }
+
 
 
 @Preview(showBackground = true)
