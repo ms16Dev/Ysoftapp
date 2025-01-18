@@ -12,7 +12,11 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -60,6 +64,9 @@ fun YsoftApp() {
             Scaffold(
                 modifier = Modifier.padding(16.dp),
                 containerColor = Color.Transparent,
+                floatingActionButton = {
+                    YsoftFAB()
+                },
                 contentColor = MaterialTheme.colorScheme.onBackground,
                 bottomBar = {
                     YsoftBottomBar(
@@ -131,6 +138,17 @@ private fun YsoftBottomBar(
         }
     }
 }
+@Composable
+fun YsoftFAB() {
+    ExtendedFloatingActionButton(
+        text = { Text(text = "Add Assignment") },
+        icon = { Icon(imageVector = Icons.Default.Add, contentDescription = "Add") },
+        onClick = {
+            // Navigate to Add Assignment
+        },
+        elevation = FloatingActionButtonDefaults.elevation(0.dp))
+}
+
 
 @Preview(showBackground = true)
 @Composable
