@@ -28,7 +28,7 @@ fun YsoftNavHost(
     ) {
         homeGraph(bottomBarVisibility, fabVisibility)
         calendarGraph(bottomBarVisibility, fabVisibility)
-        addAssignmentGraph(bottomBarVisibility, fabVisibility)
+        addAssignmentGraph(bottomBarVisibility, fabVisibility){ navController.navigateUp() }
 
 
     }
