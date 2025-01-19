@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.kapt)
+    alias(libs.plugins.kotlin.parcelize)
+
 }
 
 android {
@@ -59,6 +61,9 @@ dependencies {
     kapt(libs.hilt.compiler)
     kapt(libs.hilt.androidx.compiler)
     implementation(libs.hilt.navigation.compose)
+
+    // Gson
+    implementation(libs.gson)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

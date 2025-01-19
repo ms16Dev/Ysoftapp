@@ -10,5 +10,6 @@
     <string name="difficulty_level">Difficulty</string>
     <string name="save">Save</string>
     <string name="assignment_detail">Assignment details</string>
+    <string name="value_is_empty">Please enter a valid value for %s</string>
 
 </resources>

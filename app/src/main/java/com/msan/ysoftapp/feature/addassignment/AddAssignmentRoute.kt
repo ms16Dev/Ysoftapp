@@ -3,6 +3,7 @@ package com.msan.ysoftapp.feature.addassignment
 
 import android.app.DatePickerDialog
 import android.widget.DatePicker
+import android.widget.Toast
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -21,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -48,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.msan.ysoftapp.R
+import com.msan.ysoftapp.domain.model.Assignment
 import com.msan.ysoftapp.util.Difficulty
 import com.msan.ysoftapp.util.getRecurrenceList
 import java.text.DateFormatSymbols
@@ -57,16 +59,22 @@ import java.util.*
 @Composable
 fun AddAssignmentRoute(
     onBackClicked: () -> Unit,
-    navigateToAssignmentConfirm: () -> Unit,
+    navigateToAssignmentConfirm: (Assignment) -> Unit,
     //viewModel: CalendarViewModel = hiltViewModel()
 ) {
     AddAssignmentScreen(onBackClicked,navigateToAssignmentConfirm)
 }
 
 @Composable
-fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: () -> Unit) {
+fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: (Assignment) -> Unit) {
     var assignmentName by rememberSaveable { mutableStateOf("") }
-    var numberOfDosageSaveable by rememberSaveable { mutableStateOf("") }
+    var assignmentDetails by rememberSaveable { mutableStateOf("") }
+    var assignmentMarks by rememberSaveable { mutableStateOf("") }
+    var selectedRecurrence by rememberSaveable { mutableStateOf("") }
+    var selectedStartDate by rememberSaveable { mutableLongStateOf(0) }
+    var selectedDifficulty by rememberSaveable { mutableStateOf("") }
+    val context = LocalContext.current
+
 
     Column(
         modifier = Modifier.padding(0.dp, 16.dp).verticalScroll(rememberScrollState()),
@@ -96,7 +104,7 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: 
             modifier = Modifier.fillMaxWidth(),
             value = assignmentName,
             onValueChange = { assignmentName = it },
-            placeholder = { Text(text = "Hexamine") },
+            placeholder = { Text(text = "Assignment") },
         )
 
         Spacer(modifier = Modifier.padding(4.dp))
@@ -110,20 +118,18 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: 
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 56.dp, max = 200.dp), // Minimum and maximum height
-            value = assignmentName,
-            onValueChange = { assignmentName = it },
+            value = assignmentDetails,
+            onValueChange = { assignmentDetails = it },
             placeholder = { Text(text = "Add assignment details") },
-            maxLines = Int.MAX_VALUE, // Allows unlimited lines
-            minLines = 3, // Ensures at least 3 lines are visible
-            singleLine = false, // Enables multi-line input
-            shape = MaterialTheme.shapes.medium, // Optional: adjust the shape
+            maxLines = Int.MAX_VALUE,
+            minLines = 3,
+            singleLine = false,
+            shape = MaterialTheme.shapes.medium,
         )
         Spacer(modifier = Modifier.padding(4.dp))
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            var isMaxDoseError by rememberSaveable { mutableStateOf(false) }
-            val maxDose = 3
 
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -134,41 +140,32 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: 
                 )
                 TextField(
                     modifier = Modifier.width(128.dp),
-                    value = numberOfDosageSaveable,
-                    onValueChange = {
-                        if (it.length < maxDose) {
-                            isMaxDoseError = false
-                            numberOfDosageSaveable = it
-                        } else {
-                            isMaxDoseError = true
-                        }
+                    value = assignmentMarks,
+                    onValueChange = { input ->
+                        assignmentMarks = input
                     },
-                    trailingIcon = {
-                        if (isMaxDoseError) {
-                            Icon(
-                                imageVector = Icons.Filled.Info,
-                                contentDescription = "Error",
-                                tint = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    },
+
                     placeholder = { Text(text = "3") },
-                    isError = isMaxDoseError,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
-                if (isMaxDoseError) {
-                    Text(
-                        text = "You cannot have more than 99 dosage per day.",
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
+
             }
-            RecurrenceDropdownMenu()
+
+
+
+            RecurrenceDropdownMenu { recurrence ->
+                selectedRecurrence = recurrence
+            }
+
         }
 
+
         Spacer(modifier = Modifier.padding(4.dp))
-        UntilTextField()
+
+
+    StartDateTextField { startDate ->
+        selectedStartDate = startDate
+    }
 
 
         Spacer(modifier = Modifier.padding(4.dp))
@@ -176,7 +173,7 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: 
             text = stringResource(id = R.string.difficulty_level),
             style = MaterialTheme.typography.bodyLarge
         )
-        var selectedTime by rememberSaveable { mutableStateOf<Difficulty?>(null) }
+        var difficulty by rememberSaveable { mutableStateOf<Difficulty?>(null) }
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -185,13 +182,14 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: 
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                selected = selectedTime == Difficulty.Hard,
+                selected = difficulty == Difficulty.Hard,
                 onClick = {
-                    selectedTime = if (selectedTime == Difficulty.Hard) null else Difficulty.Hard
+                    difficulty = if (difficulty == Difficulty.Hard) null else Difficulty.Hard
+                    selectedDifficulty = difficulty.toString()
                 },
                 label = { Text(text = Difficulty.Hard.name) },
                 leadingIcon = {
-                    if (selectedTime == Difficulty.Hard) {
+                    if (difficulty == Difficulty.Hard) {
                         Icon(Icons.Default.Check, contentDescription = "Selected")
                     }
                 }
@@ -200,13 +198,14 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: 
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                selected = selectedTime == Difficulty.Moderate,
+                selected = difficulty == Difficulty.Moderate,
                 onClick = {
-                    selectedTime = if (selectedTime == Difficulty.Moderate) null else Difficulty.Moderate
+                    difficulty = if (difficulty == Difficulty.Moderate) null else Difficulty.Moderate
+                    selectedDifficulty = difficulty.toString()
                 },
                 label = { Text(text = Difficulty.Moderate.name) },
                 leadingIcon = {
-                    if (selectedTime == Difficulty.Moderate) {
+                    if (difficulty == Difficulty.Moderate) {
                         Icon(Icons.Default.Check, contentDescription = "Selected")
                     }
                 }
@@ -219,13 +218,15 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: 
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                selected = selectedTime == Difficulty.Basic,
+                selected = difficulty == Difficulty.Basic,
                 onClick = {
-                    selectedTime = if (selectedTime == Difficulty.Basic) null else Difficulty.Basic
+                    difficulty = if (difficulty == Difficulty.Basic) null else Difficulty.Basic
+                    selectedDifficulty = difficulty.toString()
+
                 },
                 label = { Text(text = Difficulty.Basic.name) },
                 leadingIcon = {
-                    if (selectedTime == Difficulty.Basic) {
+                    if (difficulty == Difficulty.Basic) {
                         Icon(Icons.Default.Check, contentDescription = "Selected")
                     }
                 }
@@ -234,13 +235,15 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: 
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                selected = selectedTime == Difficulty.Trivial,
+                selected = difficulty == Difficulty.Trivial,
                 onClick = {
-                    selectedTime = if (selectedTime == Difficulty.Trivial) null else Difficulty.Trivial
+                    difficulty = if (difficulty == Difficulty.Trivial) null else Difficulty.Trivial
+                    selectedDifficulty = difficulty.toString()
+
                 },
                 label = { Text(text = Difficulty.Trivial.name) },
                 leadingIcon = {
-                    if (selectedTime == Difficulty.Trivial) {
+                    if (difficulty == Difficulty.Trivial) {
                         Icon(Icons.Default.Check, contentDescription = "Selected")
                     }
                 }
@@ -253,9 +256,22 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: 
                 .fillMaxWidth()
                 .height(56.dp)
                 .align(Alignment.CenterHorizontally),
-            onClick = {
-                navigateToAssignmentConfirm()
 
+            onClick = {
+                validateAssignment(
+                    assignmentName = assignmentName,
+                    assignmentDetails = assignmentDetails,
+                    assignmentMarks = assignmentMarks.toIntOrNull() ?: 0,
+                    recurrence = selectedRecurrence,
+                    startDate = selectedStartDate,
+                    difficulty = selectedDifficulty,
+                    onInvalidate = {
+                        Toast.makeText(context, context.getString(R.string.value_is_empty, context.getString(it)), Toast.LENGTH_LONG).show()
+                    },
+                    onValidate = {
+                        navigateToAssignmentConfirm(it)
+                    }
+                )
             },
             shape = MaterialTheme.shapes.extraLarge
         ) {
@@ -270,7 +286,7 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecurrenceDropdownMenu() {
+fun RecurrenceDropdownMenu(recurrence: (String) -> Unit) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -311,6 +327,7 @@ fun RecurrenceDropdownMenu() {
                         text = { Text(selectionOption) },
                         onClick = {
                             selectedOptionText = selectionOption // Update the selected option
+                            recurrence(selectedOptionText)
                             expanded = false // Close the dropdown
                         }
                     )
@@ -321,7 +338,7 @@ fun RecurrenceDropdownMenu() {
 }
 
 @Composable
-fun UntilTextField() {
+fun StartDateTextField(startDate: (Long) -> Unit) {
     Text(
         text = stringResource(id = R.string.start_date),
         style = MaterialTheme.typography.bodyLarge
@@ -345,6 +362,12 @@ fun UntilTextField() {
 
     val mDatePickerDialog = DatePickerDialog(context, { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
         selectedDate = "${month.toMonthName()} $dayOfMonth, $year"
+        val selectedCalendar = Calendar.getInstance()
+        selectedCalendar.set(year, month, dayOfMonth)
+        val selectedTimeInMillis = selectedCalendar.timeInMillis
+
+        startDate(selectedTimeInMillis)
+
     }, year, month, day)
 
 
@@ -364,4 +387,60 @@ fun UntilTextField() {
 
 fun Int.toMonthName(): String {
     return DateFormatSymbols().months[this]
+}
+
+
+
+private fun validateAssignment(
+    assignmentName: String,
+    assignmentDetails: String,
+    assignmentMarks: Int,
+    recurrence: String,
+    startDate: Long,
+    difficulty: String,
+    onInvalidate: (Int) -> Unit,
+    onValidate: (Assignment) -> Unit,
+) {
+    if (assignmentName.isEmpty()) {
+        onInvalidate(R.string.assignment_name)
+        return
+    }
+
+    if (assignmentDetails.isEmpty()) {
+        onInvalidate(R.string.assignment_detail)
+        return
+    }
+
+    if (recurrence.isEmpty()) {
+        onInvalidate(R.string.recurrence)
+        return
+    }
+
+    if (assignmentMarks < 1) {
+        onInvalidate(R.string.assignment_marks)
+        return
+    }
+
+    if (startDate < 1) {
+        onInvalidate(R.string.start_date)
+        return
+    }
+
+    if (difficulty.isEmpty()) {
+        onInvalidate(R.string.difficulty_level)
+        return
+    }
+
+
+    val newAssignment =
+        Assignment(
+            id = 1231,
+            name = assignmentName,
+            details = assignmentDetails,
+            marks = assignmentMarks,
+            recurrence = recurrence,
+            startDate = Date(startDate),
+            difficulty = difficulty,
+        )
+    onValidate(newAssignment)
 }
