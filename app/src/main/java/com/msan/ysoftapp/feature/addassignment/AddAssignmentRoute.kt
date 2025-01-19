@@ -57,14 +57,14 @@ import java.util.*
 @Composable
 fun AddAssignmentRoute(
     onBackClicked: () -> Unit,
-    modifier: Modifier = Modifier,
+    navigateToAssignmentConfirm: () -> Unit,
     //viewModel: CalendarViewModel = hiltViewModel()
 ) {
-    AddAssignmentScreen(onBackClicked)
+    AddAssignmentScreen(onBackClicked,navigateToAssignmentConfirm)
 }
 
 @Composable
-fun AddAssignmentScreen(onBackClicked: () -> Unit) {
+fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: () -> Unit) {
     var assignmentName by rememberSaveable { mutableStateOf("") }
     var numberOfDosageSaveable by rememberSaveable { mutableStateOf("") }
 
@@ -254,6 +254,7 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit) {
                 .height(56.dp)
                 .align(Alignment.CenterHorizontally),
             onClick = {
+                navigateToAssignmentConfirm()
 
             },
             shape = MaterialTheme.shapes.extraLarge

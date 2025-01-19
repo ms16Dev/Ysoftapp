@@ -14,12 +14,12 @@ object AddAssignmentDestination : YsoftNavigationDestination {
     override val destination = "add_medication_destination"
 }
 
-fun NavGraphBuilder.addAssignmentGraph(bottomBarVisibility: MutableState<Boolean>, fabVisibility: MutableState<Boolean>, onBackClicked: () -> Unit) {
+fun NavGraphBuilder.addAssignmentGraph(bottomBarVisibility: MutableState<Boolean>, fabVisibility: MutableState<Boolean>, onBackClicked: () -> Unit, navigateToAssignmentConfirm: () -> Unit) {
     composable(route = AddAssignmentDestination.route) {
         LaunchedEffect(null) {
             bottomBarVisibility.value = false
             fabVisibility.value = false
         }
-        AddAssignmentRoute(onBackClicked)
+        AddAssignmentRoute(onBackClicked, navigateToAssignmentConfirm)
     }
 }
