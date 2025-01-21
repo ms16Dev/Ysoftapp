@@ -5,17 +5,22 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.navigation.NavType
 import com.google.gson.Gson
+import dagger.assisted.Assisted
 import kotlinx.parcelize.Parcelize
 import java.util.Date
 
 @Parcelize
 data class Assignment(
     val id: Int,
+    val teacherId: Int,
+    val courseId: Int,
+    val assistantId: Int,
     val name: String,
     val details: String,
     val marks: Int,
     val recurrence: String,
     val startDate: Date,
+    val timeAllowed: Int,
     val difficulty: String,
 ) : Parcelable
 

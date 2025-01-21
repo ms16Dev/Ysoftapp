@@ -7,14 +7,16 @@ import android.widget.Toast
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -35,11 +37,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,7 +57,9 @@ import com.msan.ysoftapp.util.Difficulty
 import com.msan.ysoftapp.util.getRecurrenceList
 import java.text.DateFormatSymbols
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun AddAssignmentRoute(
@@ -69,7 +74,9 @@ fun AddAssignmentRoute(
 fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: (Assignment) -> Unit) {
     var assignmentName by rememberSaveable { mutableStateOf("") }
     var assignmentDetails by rememberSaveable { mutableStateOf("") }
-    var assignmentMarks by rememberSaveable { mutableStateOf("") }
+    var assignmentMarks by rememberSaveable { mutableIntStateOf(3) }
+    var allowedTime by rememberSaveable { mutableIntStateOf(0) }
+    var timeText by rememberSaveable { mutableStateOf("") }
     var selectedRecurrence by rememberSaveable { mutableStateOf("") }
     var selectedStartDate by rememberSaveable { mutableLongStateOf(0) }
     var selectedDifficulty by rememberSaveable { mutableStateOf("") }
@@ -88,11 +95,25 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: 
         ) {
             Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
         }
+
+
+
+        Spacer(modifier = Modifier.padding(8.dp))
+
+
         Text(
             text = stringResource(id = R.string.add_assignment),
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.displaySmall
         )
+
+        Spacer(modifier = Modifier.padding(8.dp))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            dynamicDropdowns()
+
+        }
 
         Spacer(modifier = Modifier.padding(8.dp))
 
@@ -127,45 +148,30 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: 
             shape = MaterialTheme.shapes.medium,
         )
         Spacer(modifier = Modifier.padding(4.dp))
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = stringResource(id = R.string.assignment_marks),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                TextField(
-                    modifier = Modifier.width(128.dp),
-                    value = assignmentMarks,
-                    onValueChange = { input ->
-                        assignmentMarks = input
-                    },
-
-                    placeholder = { Text(text = "3") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-
+        ResponsiveRow(
+            onRecurrenceSelected = { newRecurrence ->
+                selectedRecurrence = newRecurrence
+            },
+            onMarksChanged = { newMarks ->
+                assignmentMarks = newMarks.toInt()
             }
-
-
-
-            RecurrenceDropdownMenu { recurrence ->
-                selectedRecurrence = recurrence
-            }
-
-        }
+        )
 
 
         Spacer(modifier = Modifier.padding(4.dp))
 
 
-    StartDateTextField { startDate ->
-        selectedStartDate = startDate
-    }
+        ResponsiveDateTimeInput(
+            onStartDateSelected = { startDate ->
+                selectedStartDate = startDate
+            },
+            timeText = timeText,
+            onTimeTextChanged = { newTime ->
+                allowedTime = newTime.toIntOrNull() ?: 0
+                timeText = newTime
+            }
+        )
+
 
 
         Spacer(modifier = Modifier.padding(4.dp))
@@ -261,10 +267,12 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: 
                 validateAssignment(
                     assignmentName = assignmentName,
                     assignmentDetails = assignmentDetails,
-                    assignmentMarks = assignmentMarks.toIntOrNull() ?: 0,
+                    assignmentMarks = assignmentMarks,
                     recurrence = selectedRecurrence,
                     startDate = selectedStartDate,
+                    timeAllowed = allowedTime,
                     difficulty = selectedDifficulty,
+
                     onInvalidate = {
                         Toast.makeText(context, context.getString(R.string.value_is_empty, context.getString(it)), Toast.LENGTH_LONG).show()
                     },
@@ -276,7 +284,7 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: 
             shape = MaterialTheme.shapes.extraLarge
         ) {
             Text(
-                text = stringResource(id = R.string.save),
+                text = stringResource(id = R.string.next),
                 style = MaterialTheme.typography.bodyLarge
             )
         }
@@ -313,7 +321,7 @@ fun RecurrenceDropdownMenu(recurrence: (String) -> Unit) {
                 },
                 modifier = Modifier
                     .menuAnchor() // Ensures the menu is anchored correctly to the TextField
-                    .fillMaxWidth(), // Optional: Adjust width if needed
+                    .weight(1f), // Optional: Adjust width if needed
                 colors = ExposedDropdownMenuDefaults.textFieldColors()
             )
 
@@ -339,49 +347,56 @@ fun RecurrenceDropdownMenu(recurrence: (String) -> Unit) {
 
 @Composable
 fun StartDateTextField(startDate: (Long) -> Unit) {
-    Text(
-        text = stringResource(id = R.string.start_date),
-        style = MaterialTheme.typography.bodyLarge
-    )
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
 
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed: Boolean by interactionSource.collectIsPressedAsState()
-
-    val sdf = SimpleDateFormat("LLLL dd, yyyy", Locale.getDefault())
-    val currentDate = sdf.format(Date())
-    var selectedDate by rememberSaveable { mutableStateOf(currentDate) }
+        ) {
 
 
-    val context = LocalContext.current
+        Text(
+            text = stringResource(id = R.string.start_date),
+            style = MaterialTheme.typography.bodyLarge
+        )
 
-    val calendar = Calendar.getInstance()
-    val year: Int = calendar.get(Calendar.YEAR)
-    val month: Int = calendar.get(Calendar.MONTH)
-    val day: Int = calendar.get(Calendar.DAY_OF_MONTH)
-    calendar.time = Date()
+        val interactionSource = remember { MutableInteractionSource() }
+        val isPressed: Boolean by interactionSource.collectIsPressedAsState()
 
-    val mDatePickerDialog = DatePickerDialog(context, { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
-        selectedDate = "${month.toMonthName()} $dayOfMonth, $year"
-        val selectedCalendar = Calendar.getInstance()
-        selectedCalendar.set(year, month, dayOfMonth)
-        val selectedTimeInMillis = selectedCalendar.timeInMillis
-
-        startDate(selectedTimeInMillis)
-
-    }, year, month, day)
+        val sdf = SimpleDateFormat("LLLL dd, yyyy", Locale.getDefault())
+        val currentDate = sdf.format(Date())
+        var selectedDate by rememberSaveable { mutableStateOf(currentDate) }
 
 
-    TextField(
-        modifier = Modifier.fillMaxWidth(),
-        readOnly = true,
-        value = selectedDate,
-        onValueChange = {},
-        trailingIcon = { Icons.Default.DateRange },
-        interactionSource = interactionSource
-    )
+        val context = LocalContext.current
 
-    if (isPressed) {
-        mDatePickerDialog.show()
+        val calendar = Calendar.getInstance()
+        val year: Int = calendar.get(Calendar.YEAR)
+        val month: Int = calendar.get(Calendar.MONTH)
+        val day: Int = calendar.get(Calendar.DAY_OF_MONTH)
+        calendar.time = Date()
+
+        val mDatePickerDialog =
+            DatePickerDialog(context, { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
+                selectedDate = "${month.toMonthName()} $dayOfMonth, $year"
+                val selectedCalendar = Calendar.getInstance()
+                selectedCalendar.set(year, month, dayOfMonth)
+                val selectedTimeInMillis = selectedCalendar.timeInMillis
+
+                startDate(selectedTimeInMillis)
+
+            }, year, month, day)
+
+
+        TextField(
+            readOnly = true,
+            value = selectedDate,
+            onValueChange = {},
+            trailingIcon = { Icons.Default.DateRange },
+            interactionSource = interactionSource
+        )
+
+        if (isPressed) {
+            mDatePickerDialog.show()
+        }
     }
 }
 
@@ -397,6 +412,7 @@ private fun validateAssignment(
     assignmentMarks: Int,
     recurrence: String,
     startDate: Long,
+    timeAllowed: Int,
     difficulty: String,
     onInvalidate: (Int) -> Unit,
     onValidate: (Assignment) -> Unit,
@@ -435,12 +451,252 @@ private fun validateAssignment(
     val newAssignment =
         Assignment(
             id = 1231,
+            teacherId = 124,
+            courseId = 256,
+            assistantId = 845,
             name = assignmentName,
             details = assignmentDetails,
             marks = assignmentMarks,
             recurrence = recurrence,
             startDate = Date(startDate),
+            timeAllowed = timeAllowed,
             difficulty = difficulty,
         )
     onValidate(newAssignment)
 }
+
+
+@Composable
+fun dynamicDropdowns() {
+
+    val teachers = listOf("Teacher A", "Teacher B", "Teacher C")
+    val courses = listOf("Course 1", "Course 2", "Course 3")
+    val assistants = listOf("Assistant X", "Assistant Y", "Assistant Z")
+
+    var selectedTeacher by remember { mutableStateOf<String?>(null) }
+    var selectedCourse by remember { mutableStateOf<String?>(null) }
+    var selectedAssistant by remember { mutableStateOf<String?>(null) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Teacher Dropdown
+        Dropdown(
+            label = "Select Teacher",
+            items = teachers,
+            selectedItem = selectedTeacher,
+            onItemSelected = { selectedTeacher = it }
+        )
+
+        // Course Dropdown
+        Dropdown(
+            label = "Select Course",
+            items = courses,
+            selectedItem = selectedCourse,
+            onItemSelected = { selectedCourse = it }
+        )
+
+        // Assistant Dropdown
+        Dropdown(
+            label = "Select Assistant",
+            items = assistants,
+            selectedItem = selectedAssistant,
+            onItemSelected = { selectedAssistant = it }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Dropdown(
+    label: String,
+    items: List<String>,
+    selectedItem: String?,
+    onItemSelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
+    ) {
+        TextField(
+            value = selectedItem ?: label,
+            onValueChange = {},
+            readOnly = true,
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth()
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            items.forEach { item ->
+                DropdownMenuItem(
+                    text = { Text(item) },
+                    onClick = {
+                        onItemSelected(item)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ResponsiveRow(
+    onRecurrenceSelected: (String) -> Unit,
+    onMarksChanged: (Long) -> Unit = {}
+) {
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        val isSmallScreen = maxWidth < 600.dp // Define a breakpoint for small screens
+
+        if (isSmallScreen) {
+            // Stack elements vertically for small screens
+            Column(
+
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                AssignmentMarksInput { marks ->
+                    onMarksChanged(marks) // Update the state via the lambda
+                }
+                RecurrenceDropdownMenu { recurrence ->
+                    onRecurrenceSelected(recurrence) // Update the state via the lambda
+                }
+            }
+        } else {
+            // Arrange elements side-by-side for larger screens
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    AssignmentMarksInput { marks ->
+                        onMarksChanged(marks) // Update the state via the lambda
+                    }
+                }
+
+                RecurrenceDropdownMenu { recurrence ->
+                    onRecurrenceSelected(recurrence)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AssignmentMarksInput( marks: (Long) -> Unit,) {
+    var marksText by rememberSaveable { mutableStateOf("") }
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = stringResource(id = R.string.assignment_marks),
+            style = MaterialTheme.typography.bodyLarge
+        )
+        TextField(
+            value = marksText,
+            onValueChange = { newValue ->
+                if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
+                    marksText = newValue
+                    marks(newValue.toLongOrNull() ?: 0)
+                }
+            },
+            label = { Text("Enter an integer") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            singleLine = true
+        )
+    }
+}
+
+@Composable
+fun ResponsiveDateTimeInput(
+    onStartDateSelected: (Long) -> Unit,
+    timeText: String,
+    onTimeTextChanged: (String) -> Unit
+) {
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        val isSmallScreen = maxWidth < 600.dp // Define a breakpoint for small screens
+
+        if (isSmallScreen) {
+            // Stack elements vertically for small screens
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                StartDateTextField { startDate ->
+                    onStartDateSelected(startDate)
+                }
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.time_allowed),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    TextField(
+                        value = timeText,
+                        onValueChange = { newValue ->
+                            if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
+                                onTimeTextChanged(newValue)
+                            }
+                        },
+                        label = { Text("Enter an integer") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true
+                    )
+                }
+            }
+        } else {
+            // Arrange elements side-by-side for larger screens
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                StartDateTextField { startDate ->
+                    onStartDateSelected(startDate)
+                }
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.time_allowed),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    TextField(
+                        value = timeText,
+                        onValueChange = { newValue ->
+                            if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
+                                onTimeTextChanged(newValue)
+                            }
+                        },
+                        label = { Text("Enter an integer") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true
+                    )
+                }
+            }
+        }
+    }
+}
+

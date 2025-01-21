@@ -11,5 +11,9 @@
     <string name="save">Save</string>
     <string name="assignment_detail">Assignment details</string>
     <string name="value_is_empty">Please enter a valid value for %s</string>
+    <string name="next">Next</string>
+    <string name="time_allowed">Allowd time(Days)</string>
+    <string name="all_set">All Set</string>
+    <string name="all_done">All done</string>
 
 </resources>

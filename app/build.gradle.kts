@@ -58,6 +58,9 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
+    implementation(libs.androidx.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     kapt(libs.hilt.compiler)
     kapt(libs.hilt.androidx.compiler)
     implementation(libs.hilt.navigation.compose)
