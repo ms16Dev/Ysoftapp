@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.kapt)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.ksp)
+
 
 }
 
@@ -41,6 +43,9 @@ android {
     buildFeatures {
         compose = true
     }
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
+    }
 }
 
 dependencies {
@@ -55,14 +60,16 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.foundation)
-
-    // Hilt
-    implementation(libs.hilt.android)
     implementation(libs.androidx.runtime)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.room.compiler)
-    implementation(libs.androidx.room.runtime)
+    // Room
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
+    // Hilt
+    implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
     kapt(libs.hilt.androidx.compiler)
     implementation(libs.hilt.navigation.compose)
