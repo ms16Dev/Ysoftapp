@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.androidx.runtime)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.runtime)
     kapt(libs.hilt.compiler)
     kapt(libs.hilt.androidx.compiler)
     implementation(libs.hilt.navigation.compose)
