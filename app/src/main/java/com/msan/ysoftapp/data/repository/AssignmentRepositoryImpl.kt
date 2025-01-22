@@ -1,25 +1,49 @@
 package com.msan.ysoftapp.data.repository
 
 import com.msan.ysoftapp.data.AssignmentDao
+import com.msan.ysoftapp.data.mapper.toAssignment
+import com.msan.ysoftapp.data.mapper.toAssignmentEntity
 import com.msan.ysoftapp.domain.model.Assignment
 import com.msan.ysoftapp.domain.repository.AssignmentRepository
 import kotlinx.coroutines.flow.Flow
-import java.time.LocalDate
+import kotlinx.coroutines.flow.map
+
 
 class AssignmentRepositoryImpl(
     private val dao: AssignmentDao
 ): AssignmentRepository {
 
     override suspend fun insertAssignment(assignment: Assignment) {
-        TODO("Not yet implemented")
+        dao.insertAssignment(assignment.toAssignmentEntity())
     }
 
     override suspend fun deleteAssignment(assignment: Assignment) {
-        TODO("Not yet implemented")
+        dao.deleteAssignment(assignment.toAssignmentEntity())
     }
 
-    override fun getAssignmentsForDate(localDate: LocalDate): Flow<List<AssignmentDao>> {
-        TODO("Not yet implemented")
+    override suspend fun updateAssignment(assignment: Assignment) {
+        dao.updateAssignment(assignment.toAssignmentEntity())
+    }
+
+    override fun getAllAssignments(): Flow<List<Assignment>> {
+        return dao.getAllAssignments().map { entities ->
+            entities.map { it.toAssignment() }
+        }
+    }
+
+
+
+
+    override fun getAssignmentsForDate(date: String): Flow<List<Assignment>> {
+        return dao.getAssignmentsForDate(
+            date = date
+        ).map { entities ->
+            entities.map { it.toAssignment() }
+        }
+    }
+
+    override suspend fun getAssignmentById(id: Long): Assignment? {
+        return dao.getAssignmentById(id)?.toAssignment()
     }
 
 

@@ -13,5 +13,5 @@ import com.msan.ysoftapp.data.entity.AssignmentEntity
 @TypeConverters(Converters::class)
 abstract class AssignmentDatabase: RoomDatabase() {
 
-    abstract val dao: AssignmentDao
+    abstract fun assignmentDao(): AssignmentDao
 }

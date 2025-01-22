@@ -11,7 +11,7 @@ import java.util.Date
 
 @Parcelize
 data class Assignment(
-    val id: Int,
+    val id: Long,
     val teacherId: Int,
     val courseId: Int,
     val assistantId: Int,
