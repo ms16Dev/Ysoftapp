@@ -450,7 +450,6 @@ private fun validateAssignment(
 
     val newAssignment =
         Assignment(
-            id = 1231,
             teacherId = 124,
             courseId = 256,
             assistantId = 845,
@@ -458,7 +457,7 @@ private fun validateAssignment(
             details = assignmentDetails,
             marks = assignmentMarks,
             recurrence = recurrence,
-            startDate = Date(startDate),
+            startDate = startDate,
             timeAllowed = timeAllowed,
             difficulty = difficulty,
         )
