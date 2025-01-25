@@ -21,7 +21,6 @@ class AssignmentRepositoryImpl(
 
         val assignmentEntity = assignment.toAssignmentEntity()
 
-        // Assuming you have access to the `id`, pass it to the DAO method
         dao.deleteAssignmentById(assignmentEntity.id)
     }
 
