@@ -18,7 +18,11 @@ class AssignmentRepositoryImpl(
     }
 
     override suspend fun deleteAssignment(assignment: Assignment) {
-        dao.deleteAssignment(assignment.toAssignmentEntity())
+
+        val assignmentEntity = assignment.toAssignmentEntity()
+
+        // Assuming you have access to the `id`, pass it to the DAO method
+        dao.deleteAssignmentById(assignmentEntity.id)
     }
 
     override suspend fun updateAssignment(assignment: Assignment) {
@@ -34,7 +38,7 @@ class AssignmentRepositoryImpl(
 
 
 
-    override fun getAssignmentsForDate(date: String): Flow<List<Assignment>> {
+    override fun getAssignmentsForDate(date: Long): Flow<List<Assignment>> {
         return dao.getAssignmentsForDate(
             date = date
         ).map { entities ->

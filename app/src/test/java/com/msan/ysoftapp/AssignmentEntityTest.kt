@@ -4,14 +4,17 @@ import com.google.gson.Gson
 import com.msan.ysoftapp.data.entity.AssignmentEntity
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.util.Date
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class AssignmentEntityTest {
 
     @Test
     fun `assignment entity serialization works`() {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
         val entity = AssignmentEntity(
-            id = 1,
+
             teacherId = 100,
             courseId = 200,
             assistantId = 300,
@@ -19,7 +22,7 @@ class AssignmentEntityTest {
             details = "Solve the equations",
             marks = 10,
             recurrence = "Weekly",
-            startDate = Date(),
+            startDate = dateFormat.parse("2024-01-01")!!.time, // Convert to Long here
             timeAllowed = 60,
             difficulty = "Medium"
         )

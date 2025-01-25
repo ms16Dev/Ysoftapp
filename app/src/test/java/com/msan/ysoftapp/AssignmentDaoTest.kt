@@ -3,11 +3,14 @@ package com.msan.ysoftapp
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.RoomDatabase
 import androidx.test.core.app.ApplicationProvider
 import com.msan.ysoftapp.data.AssignmentDao
 import com.msan.ysoftapp.data.AssignmentDatabase
 import com.msan.ysoftapp.data.entity.AssignmentEntity
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert
@@ -32,9 +35,14 @@ class AssignmentDaoTest {
         database = Room.inMemoryDatabaseBuilder(
             context,
             AssignmentDatabase::class.java
-        ).allowMainThreadQueries().build()
+        ).setJournalMode(RoomDatabase.JournalMode.TRUNCATE)  // You can enable logging
+        .allowMainThreadQueries().build()
         dao = database.assignmentDao()
+
+        database.clearAllTables()
+
     }
+
 
     @After
     fun tearDown() {
@@ -45,7 +53,6 @@ class AssignmentDaoTest {
     fun `insert and retrieve assignments`() = runBlocking {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val entity = AssignmentEntity(
-            id = 1,
             teacherId = 100,
             courseId = 200,
             assistantId = 300,
@@ -53,14 +60,21 @@ class AssignmentDaoTest {
             details = "Solve the equations",
             marks = 10,
             recurrence = "Weekly",
-            startDate = dateFormat.parse("2024-01-01")!!,
+            startDate = dateFormat.parse("2024-01-01")!!.time, // Convert to Long here
             timeAllowed = 60,
             difficulty = "Medium"
         )
 
         dao.insertAssignment(entity)
+        delay(100)  // Give the database some time to commit
 
-        val result = dao.getAssignmentsForDate("2024-01-01").first()
+
+        val result = dao.getAssignmentsForDate(entity.startDate).first()
+        println("Assignments for 2024-01-01: $result")  // Add this log statement
+
+        val startDate = dao.getStartDateForAssignment("Math Assignment").first()
+        println("Start date in database: $startDate")  // Log the startDate to verify
+
         Assert.assertTrue(result.contains(entity))
     }
 
@@ -68,7 +82,6 @@ class AssignmentDaoTest {
     fun `delete assignment`() = runBlocking {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val entity = AssignmentEntity(
-            id = 1,
             teacherId = 100,
             courseId = 200,
             assistantId = 300,
@@ -76,15 +89,28 @@ class AssignmentDaoTest {
             details = "Solve the equations",
             marks = 10,
             recurrence = "Weekly",
-            startDate = dateFormat.parse("2024-01-01")!!,
+            startDate = dateFormat.parse("2024-01-02")!!.time, // Convert to Long here
             timeAllowed = 60,
             difficulty = "Medium"
         )
 
+        // Insert the assignment
         dao.insertAssignment(entity)
-        dao.deleteAssignment(entity)
+        delay(100) // Allow time for the insert operation to complete
 
-        val result = dao.getAssignmentsForDate("2024-01-01").first()
-        Assert.assertTrue(result.isEmpty())
+        // Fetch the inserted assignment to get its ID
+        val insertedAssignment = dao.getAssignmentsForDate(entity.startDate).firstOrNull()?.first()
+        Assert.assertNotNull("Inserted assignment should not be null", insertedAssignment)
+
+        // Delete the assignment using its ID
+        dao.deleteAssignmentById(insertedAssignment!!.id)
+        delay(100) // Allow time for the delete operation to complete
+
+        // Verify the assignment has been deleted
+        val resultAfterDelete = dao.getAssignmentsForDate(entity.startDate).first()
+        println("Assignments for 2024-01-02 after delete: $resultAfterDelete") // Log the result after deletion
+
+        Assert.assertTrue(resultAfterDelete.isEmpty())
     }
+
 }

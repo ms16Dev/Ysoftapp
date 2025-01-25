@@ -16,7 +16,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 class AssignmentRepositoryImplTest {
@@ -24,7 +23,7 @@ class AssignmentRepositoryImplTest {
     private lateinit var dao: AssignmentDao
     private lateinit var repository: AssignmentRepositoryImpl
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    private val startDate: Date = dateFormat.parse("2024-01-01") // this will be a non-null Date
+    private val startDate =  dateFormat.parse("2024-01-01").time
 
 
     @Before
@@ -37,7 +36,6 @@ class AssignmentRepositoryImplTest {
     fun `insertAssignment calls DAO insert`() = runTest {
 
         val assignment = Assignment(
-            id = 1,
             teacherId = 100,
             courseId = 200,
             assistantId = 300,
@@ -58,7 +56,6 @@ class AssignmentRepositoryImplTest {
     @Test
     fun `deleteAssignment calls DAO delete`() = runTest {
         val assignment = Assignment(
-            id = 1,
             teacherId = 100,
             courseId = 200,
             assistantId = 300,
@@ -71,15 +68,20 @@ class AssignmentRepositoryImplTest {
             difficulty = "Easy"
         )
 
+
+
+
+        val assignmentEntity = assignment.toAssignmentEntity()
+
         repository.deleteAssignment(assignment)
 
-        verify(dao).deleteAssignment(assignment.toAssignmentEntity())
+
+        verify(dao).deleteAssignmentById(assignmentEntity.id)
     }
 
     @Test
     fun `updateAssignment calls DAO update`() = runTest {
         val assignment = Assignment(
-            id = 1,
             teacherId = 100,
             courseId = 200,
             assistantId = 300,
@@ -115,16 +117,18 @@ class AssignmentRepositoryImplTest {
 
     @Test
     fun `getAssignmentsForDate transforms DAO flow into domain model`() = runTest {
-        val date = "2024-01-01"
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val startDate = dateFormat.parse("2024-01-01")!!.time // Convert to Long here
+
         val entityList = listOf(
             mockAssignmentEntity(1),
             mockAssignmentEntity(2)
         )
         val domainList = entityList.map { it.toAssignment() }
 
-        whenever(dao.getAssignmentsForDate(date)).thenReturn(flowOf(entityList))
+        whenever(dao.getAssignmentsForDate(startDate)).thenReturn(flowOf(entityList))
 
-        repository.getAssignmentsForDate(date).test {
+        repository.getAssignmentsForDate(startDate).test {
             assertEquals(domainList, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
@@ -144,7 +148,6 @@ class AssignmentRepositoryImplTest {
 
     // Helper method to create mock entities
     private fun mockAssignmentEntity(id: Long) = AssignmentEntity(
-        id = id,
         teacherId = 100,
         courseId = 200,
         assistantId = 300,
@@ -152,7 +155,7 @@ class AssignmentRepositoryImplTest {
         details = "Details for Assignment $id",
         marks = 10,
         recurrence = "None",
-        startDate = startDate,
+        startDate = dateFormat.parse("2024-01-01")!!.time, // Convert to Long here
         timeAllowed = 60,
         difficulty = "Easy"
     )

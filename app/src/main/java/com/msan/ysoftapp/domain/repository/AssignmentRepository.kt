@@ -14,7 +14,7 @@ interface AssignmentRepository {
     fun getAllAssignments(): Flow<List<Assignment>>
 
 
-    fun getAssignmentsForDate(date: String): Flow<List<Assignment>>
+    fun getAssignmentsForDate(date: Long): Flow<List<Assignment>>
 
     suspend fun getAssignmentById(id: Long): Assignment?
 
