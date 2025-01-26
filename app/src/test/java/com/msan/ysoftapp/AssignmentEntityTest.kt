@@ -22,7 +22,7 @@ class AssignmentEntityTest {
             details = "Solve the equations",
             marks = 10,
             recurrence = "Weekly",
-            startDate = dateFormat.parse("2024-01-01")!!.time, // Convert to Long here
+            startDate = dateFormat.parse("2024-01-01")!!, // Convert to Long here
             timeAllowed = 60,
             difficulty = "Medium"
         )

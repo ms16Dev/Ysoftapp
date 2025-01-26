@@ -47,7 +47,7 @@ object AssignmentDataModule {
         db: AssignmentDatabase
     ): AssignmentRepository {
         return AssignmentRepositoryImpl(
-            dao = db.assignmentDao()
+            dao = db.dao
         )
     }
 }

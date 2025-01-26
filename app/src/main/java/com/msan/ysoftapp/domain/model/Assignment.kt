@@ -6,6 +6,7 @@ import android.os.Parcelable
 import androidx.navigation.NavType
 import com.google.gson.Gson
 import kotlinx.parcelize.Parcelize
+import java.util.Date
 
 @Parcelize
 data class Assignment(
@@ -16,7 +17,7 @@ data class Assignment(
     val details: String,
     val marks: Int,
     val recurrence: String,
-    val startDate: Long,
+    val startDate: Date,
     val timeAllowed: Int,
     val difficulty: String,
 ) : Parcelable

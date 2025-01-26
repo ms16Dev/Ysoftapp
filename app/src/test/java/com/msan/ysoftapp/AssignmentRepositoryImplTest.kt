@@ -23,7 +23,7 @@ class AssignmentRepositoryImplTest {
     private lateinit var dao: AssignmentDao
     private lateinit var repository: AssignmentRepositoryImpl
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    private val startDate =  dateFormat.parse("2024-01-01").time
+    private val startDate =  dateFormat.parse("2024-01-01")
 
 
     @Before
@@ -43,7 +43,7 @@ class AssignmentRepositoryImplTest {
             details = "Test Details",
             marks = 10,
             recurrence = "None",
-            startDate = startDate,
+            startDate = startDate!!,
             timeAllowed = 60,
             difficulty = "Easy"
         )
@@ -63,7 +63,7 @@ class AssignmentRepositoryImplTest {
             details = "Test Details",
             marks = 10,
             recurrence = "None",
-            startDate = startDate,
+            startDate = startDate!!,
             timeAllowed = 60,
             difficulty = "Easy"
         )
@@ -89,7 +89,7 @@ class AssignmentRepositoryImplTest {
             details = "Test Details",
             marks = 10,
             recurrence = "None",
-            startDate = startDate,
+            startDate = startDate!!,
             timeAllowed = 60,
             difficulty = "Easy"
         )
@@ -118,7 +118,7 @@ class AssignmentRepositoryImplTest {
     @Test
     fun `getAssignmentsForDate transforms DAO flow into domain model`() = runTest {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val startDate = dateFormat.parse("2024-01-01")!!.time // Convert to Long here
+        val startDate = dateFormat.parse("2024-01-01")!! // Convert to Long here
 
         val entityList = listOf(
             mockAssignmentEntity(1),
@@ -155,7 +155,7 @@ class AssignmentRepositoryImplTest {
         details = "Details for Assignment $id",
         marks = 10,
         recurrence = "None",
-        startDate = dateFormat.parse("2024-01-01")!!.time, // Convert to Long here
+        startDate = dateFormat.parse("2024-01-01")!!, // Convert to Long here
         timeAllowed = 60,
         difficulty = "Easy"
     )

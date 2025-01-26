@@ -9,6 +9,7 @@ import androidx.room.Update
 import com.msan.ysoftapp.data.entity.AssignmentEntity
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
+import java.util.Date
 
 @Dao
 interface AssignmentDao {
@@ -30,7 +31,7 @@ interface AssignmentDao {
     fun getAllAssignments(): Flow<List<AssignmentEntity>>
 
     @Query("SELECT * FROM assignmentEntity WHERE startDate = :date ORDER BY startDate ASC")
-    fun getAssignmentsForDate(date: Long): Flow<List<AssignmentEntity>>
+    fun getAssignmentsForDate(date: Date): Flow<List<AssignmentEntity>>
 
     @Query("SELECT * FROM assignmentEntity WHERE id = :id")
     suspend fun getAssignmentById(id: Long): AssignmentEntity?

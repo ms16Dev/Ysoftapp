@@ -2,6 +2,7 @@ package com.msan.ysoftapp.domain.repository
 
 import com.msan.ysoftapp.domain.model.Assignment
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 
 interface AssignmentRepository {
 
@@ -14,7 +15,7 @@ interface AssignmentRepository {
     fun getAllAssignments(): Flow<List<Assignment>>
 
 
-    fun getAssignmentsForDate(date: Long): Flow<List<Assignment>>
+    fun getAssignmentsForDate(date: Date): Flow<List<Assignment>>
 
     suspend fun getAssignmentById(id: Long): Assignment?
 

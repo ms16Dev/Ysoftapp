@@ -7,11 +7,12 @@ import com.msan.ysoftapp.domain.model.Assignment
 import com.msan.ysoftapp.domain.repository.AssignmentRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.util.Date
 
 
 class AssignmentRepositoryImpl(
     private val dao: AssignmentDao
-): AssignmentRepository {
+) : AssignmentRepository {
 
     override suspend fun insertAssignment(assignment: Assignment) {
         dao.insertAssignment(assignment.toAssignmentEntity())
@@ -21,7 +22,6 @@ class AssignmentRepositoryImpl(
 
         val assignmentEntity = assignment.toAssignmentEntity()
 
-        // Assuming you have access to the `id`, pass it to the DAO method
         dao.deleteAssignmentById(assignmentEntity.id)
     }
 
@@ -36,9 +36,7 @@ class AssignmentRepositoryImpl(
     }
 
 
-
-
-    override fun getAssignmentsForDate(date: Long): Flow<List<Assignment>> {
+    override fun getAssignmentsForDate(date: Date): Flow<List<Assignment>> {
         return dao.getAssignmentsForDate(
             date = date
         ).map { entities ->
