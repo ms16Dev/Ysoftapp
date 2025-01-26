@@ -10,9 +10,9 @@ import com.msan.ysoftapp.data.entity.AssignmentEntity
 
 @Database(
     entities = [AssignmentEntity::class],
-    version = 2,
+    version = 3,
     autoMigrations = [
-        AutoMigration(from = 1, to = 2, spec = AssignmentDatabase.AutoMigration::class)
+        AutoMigration(from = 2, to = 3, spec = AssignmentDatabase.AutoMigration::class)
     ]
 )
 @TypeConverters(Converters::class)

@@ -41,7 +41,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.msan.ysoftapp.R
 import com.msan.ysoftapp.domain.model.Assignment
 import com.msan.ysoftapp.extention.toFormattedDateShortString
-import com.msan.ysoftapp.extention.toFormattedDateString
 import com.msan.ysoftapp.extention.toFormattedMonthDateString
 import com.msan.ysoftapp.feature.home.data.CalendarDataSource
 import com.msan.ysoftapp.feature.home.model.CalendarModel
@@ -59,6 +58,7 @@ fun HomeRoute(
     HomeScreen(
         modifier = modifier,
         state = state,
+        onDateSelected = viewModel::selectDate,
         onSelectedDate = { viewModel.updateSelectedDate(it) },
     )
 }
@@ -67,6 +67,7 @@ fun HomeRoute(
 fun HomeScreen(
     modifier: Modifier,
     state: HomeState,
+    onDateSelected: (CalendarModel.DateModel) -> Unit,
     onSelectedDate: (Date) -> Unit,
 ) {
     Column(
@@ -76,7 +77,9 @@ fun HomeScreen(
         DailyAssignments(
             state = state,
             onSelectedDate = onSelectedDate,
-        )
+            onDateSelected = onDateSelected,
+
+            )
     }
 }
 
@@ -85,12 +88,15 @@ fun HomeScreen(
 fun DailyAssignments(
     state: HomeState,
     onSelectedDate: (Date) -> Unit,
+    onDateSelected: (CalendarModel.DateModel) -> Unit
 ) {
 
     DatesHeader(
         lastSelectedDate = state.lastSelectedDate,
         onDateSelected = { selectedDate ->
             onSelectedDate(selectedDate.date)
+            onDateSelected(selectedDate)
+
         }
     )
 
@@ -230,7 +236,7 @@ fun DatesHeader(
                     selectedDate = date,
                     visibleDates = calendarModel.visibleDates.map {
                         it.copy(
-                            isSelected = it.date.toFormattedDateString() == date.date.toFormattedDateString()
+                            isSelected = it.date == date.date
                         )
                     }
                 )

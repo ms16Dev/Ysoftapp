@@ -2,6 +2,7 @@ package com.msan.ysoftapp.data.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.util.Date
 
 @Entity
 data class AssignmentEntity(
@@ -13,7 +14,7 @@ data class AssignmentEntity(
     val details: String,
     val marks: Int,
     val recurrence: String,
-    val startDate: Long,
+    val startDate: Date,
     val timeAllowed: Int,
     val difficulty: String,
 ) {

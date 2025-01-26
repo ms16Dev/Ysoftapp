@@ -37,7 +37,7 @@ class AssignmentDaoTest {
             AssignmentDatabase::class.java
         ).setJournalMode(RoomDatabase.JournalMode.TRUNCATE)  // You can enable logging
         .allowMainThreadQueries().build()
-        dao = database.assignmentDao()
+        dao = database.dao
 
         database.clearAllTables()
 
@@ -60,7 +60,7 @@ class AssignmentDaoTest {
             details = "Solve the equations",
             marks = 10,
             recurrence = "Weekly",
-            startDate = dateFormat.parse("2024-01-01")!!.time, // Convert to Long here
+            startDate = dateFormat.parse("2024-01-01")!!, // Convert to Long here
             timeAllowed = 60,
             difficulty = "Medium"
         )
@@ -89,7 +89,7 @@ class AssignmentDaoTest {
             details = "Solve the equations",
             marks = 10,
             recurrence = "Weekly",
-            startDate = dateFormat.parse("2024-01-02")!!.time, // Convert to Long here
+            startDate = dateFormat.parse("2024-01-02")!!, // Convert to Long here
             timeAllowed = 60,
             difficulty = "Medium"
         )

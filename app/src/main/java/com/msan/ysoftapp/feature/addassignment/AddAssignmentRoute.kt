@@ -53,6 +53,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.msan.ysoftapp.R
 import com.msan.ysoftapp.domain.model.Assignment
+import com.msan.ysoftapp.extention.toDate
+import com.msan.ysoftapp.extention.toFormattedDateString
+import com.msan.ysoftapp.extention.toFormattedYearMonthDateString
+import com.msan.ysoftapp.extention.truncateToMidnight
 import com.msan.ysoftapp.util.Difficulty
 import com.msan.ysoftapp.util.getRecurrenceList
 import java.text.DateFormatSymbols
@@ -263,13 +267,17 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: 
                 .height(56.dp)
                 .align(Alignment.CenterHorizontally),
 
+
+
             onClick = {
+                val stringDate = Date().toFormattedYearMonthDateString().toDate()
+
                 validateAssignment(
                     assignmentName = assignmentName,
                     assignmentDetails = assignmentDetails,
                     assignmentMarks = assignmentMarks,
                     recurrence = selectedRecurrence,
-                    startDate = selectedStartDate,
+                    startDate = stringDate!!,
                     timeAllowed = allowedTime,
                     difficulty = selectedDifficulty,
 
@@ -411,7 +419,7 @@ private fun validateAssignment(
     assignmentDetails: String,
     assignmentMarks: Int,
     recurrence: String,
-    startDate: Long,
+    startDate: Date,
     timeAllowed: Int,
     difficulty: String,
     onInvalidate: (Int) -> Unit,
@@ -437,10 +445,7 @@ private fun validateAssignment(
         return
     }
 
-    if (startDate < 1) {
-        onInvalidate(R.string.start_date)
-        return
-    }
+
 
     if (difficulty.isEmpty()) {
         onInvalidate(R.string.difficulty_level)

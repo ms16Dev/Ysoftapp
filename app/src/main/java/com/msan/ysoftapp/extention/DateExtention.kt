@@ -6,6 +6,16 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+fun Date.truncateToMidnight(date: Date): Date {
+    val calendar = Calendar.getInstance().apply {
+        time = date
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }
+    return calendar.time
+}
 
 fun Date.toMillis(dateString: String): Long {
     val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())

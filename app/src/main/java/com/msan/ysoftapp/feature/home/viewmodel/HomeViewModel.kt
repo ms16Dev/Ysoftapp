@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.msan.ysoftapp.domain.model.Assignment
+import com.msan.ysoftapp.extention.toDate
 import com.msan.ysoftapp.feature.home.usecase.GetAssignmentsUseCase
 import com.msan.ysoftapp.feature.home.usecase.UpdateAssignmentUseCase
 import com.msan.ysoftapp.extention.toFormattedYearMonthDateString
@@ -38,7 +39,7 @@ class HomeViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _assignments = _dateFilter.flatMapLatest { selectedDate ->
-        getAssignmentsUseCase.getAssignments(selectedDate)
+        getAssignmentsUseCase.getAssignments(selectedDate.toDate())
     }
 
     val homeUiState = combine(
