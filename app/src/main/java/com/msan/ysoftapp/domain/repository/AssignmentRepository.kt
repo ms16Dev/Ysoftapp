@@ -6,7 +6,7 @@ import java.util.Date
 
 interface AssignmentRepository {
 
-    suspend fun insertAssignment(assignment: Assignment)
+    suspend fun insertAssignments(assignments: List<Assignment>): Flow<List<Assignment>>
 
     suspend fun deleteAssignment(assignment: Assignment)
 

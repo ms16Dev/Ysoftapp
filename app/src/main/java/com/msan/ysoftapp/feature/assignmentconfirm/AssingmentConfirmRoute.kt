@@ -29,21 +29,21 @@ import com.msan.ysoftapp.feature.assignmentconfirm.viewmodel.AssignmentConfirmVi
 
 @Composable
 fun AssignmentConfirmRoute(
-    assignment: Assignment,
+    assignments: List<Assignment>,
     onBackClicked: () -> Unit,
     navigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AssignmentConfirmViewModel = hiltViewModel()
 ) {
     AssignmentConfirmScreen(
-        assignment = assignment,
+        assignments = assignments,
         viewModel,
         onBackClicked,
         navigateToHome)
 }
 
 @Composable
-fun AssignmentConfirmScreen(assignment: Assignment, viewModel: AssignmentConfirmViewModel, onBackClicked: () -> Unit, navigateToHome: () -> Unit) {
+fun AssignmentConfirmScreen(assignments: List<Assignment>, viewModel: AssignmentConfirmViewModel, onBackClicked: () -> Unit, navigateToHome: () -> Unit) {
 
 
 
@@ -71,7 +71,7 @@ fun AssignmentConfirmScreen(assignment: Assignment, viewModel: AssignmentConfirm
             )
 
             Text(
-                text = assignment.toString(),
+                text = assignments.toString(),
                 style = MaterialTheme.typography.bodyLarge
             )
         }
@@ -93,7 +93,7 @@ fun AssignmentConfirmScreen(assignment: Assignment, viewModel: AssignmentConfirm
                 .align(Alignment.CenterHorizontally),
             onClick = {
 
-                viewModel.addAssignment(AssignmentConfirmState(assignment))
+                viewModel.addAssignment(AssignmentConfirmState(assignments))
                 navigateToHome()
             },
             shape = MaterialTheme.shapes.extraLarge

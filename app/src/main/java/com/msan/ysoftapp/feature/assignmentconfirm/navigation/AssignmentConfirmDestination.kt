@@ -26,9 +26,9 @@ fun NavGraphBuilder.assignmentConfirmGraph(navController: NavController, bottomB
             fabVisibility.value = false
         }
         val assignmentBundle = navController.previousBackStackEntry?.savedStateHandle?.get<Bundle>(ASSIGNMENT)
-        val assignment = assignmentBundle?.getParcelable<Assignment>(ASSIGNMENT)
-        if (assignment != null) {
-            AssignmentConfirmRoute(assignment, onBackClicked, navigateToHome)
+        val assignments = assignmentBundle?.getParcelableArrayList<Assignment>(ASSIGNMENT)
+        if (assignments != null) {
+            AssignmentConfirmRoute(assignments, onBackClicked, navigateToHome)
         }
     }
 }

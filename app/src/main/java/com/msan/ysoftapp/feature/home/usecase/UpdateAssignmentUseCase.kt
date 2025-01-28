@@ -8,8 +8,8 @@ class UpdateAssignmentUseCase @Inject constructor(
     private val repository: AssignmentRepository
 ) {
 
-    suspend fun updateAssignment(medication: Assignment) {
-        return repository.updateAssignment(medication)
+    suspend fun updateAssignment(assignment: Assignment) {
+        return repository.updateAssignment(assignment)
     }
 }
 

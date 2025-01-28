@@ -1,26 +1,24 @@
 package com.msan.ysoftapp.data
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.msan.ysoftapp.data.entity.AssignmentEntity
 import kotlinx.coroutines.flow.Flow
-import java.time.LocalDate
 import java.util.Date
 
 @Dao
 interface AssignmentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAssignment(assignmentEntity: AssignmentEntity)
+    suspend fun insertAssignment(assignmentEntity: AssignmentEntity) : Long
 
     @Query("DELETE FROM assignmentEntity WHERE id = :id")
     suspend fun deleteAssignmentById(id: Long)
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun updateAssignment(medicationEntity: AssignmentEntity)
+    suspend fun updateAssignment(assignmentEntity: AssignmentEntity)
 
     @Query(
         """

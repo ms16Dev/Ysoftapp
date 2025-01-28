@@ -18,5 +18,7 @@
     <string name="today">Today</string>
     <string name="assignment_break">Assignment Braek</string>
     <string name="home_screen_empty_card_message">No Assignments schedualed for this date. Take a break :)</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

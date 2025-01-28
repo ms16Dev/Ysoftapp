@@ -6,7 +6,8 @@ import java.util.Date
 
 @Entity
 data class AssignmentEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
     val teacherId: Int,
     val courseId: Int,
     val assistantId: Int,

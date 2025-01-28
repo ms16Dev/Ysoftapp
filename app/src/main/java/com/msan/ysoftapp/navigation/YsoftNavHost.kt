@@ -17,6 +17,7 @@ import com.msan.ysoftapp.feature.assignmentconfirm.navigation.assignmentConfirmG
 import com.msan.ysoftapp.feature.calendar.navegation.calendarGraph
 import com.msan.ysoftapp.feature.home.navigation.HomeDestination
 import com.msan.ysoftapp.feature.home.navigation.homeGraph
+import java.util.ArrayList
 
 
 @Composable
@@ -41,7 +42,7 @@ fun YsoftNavHost(
             onBackClicked = { navController.navigateUp() },
             navigateToAssignmentConfirm = {
                 val bundle = Bundle()
-                bundle.putParcelable(ASSIGNMENT, it)
+                bundle.putParcelableArrayList(ASSIGNMENT, ArrayList(it))
                 navController.currentBackStackEntry?.savedStateHandle.apply {
                     this?.set(ASSIGNMENT, bundle)
                 }

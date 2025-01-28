@@ -6,6 +6,7 @@ import com.msan.ysoftapp.domain.model.Assignment
 
 fun AssignmentEntity.toAssignment(): Assignment {
     return Assignment(
+        id = id,
         teacherId = teacherId,
         courseId = courseId,
         assistantId = assistantId,
@@ -21,6 +22,7 @@ fun AssignmentEntity.toAssignment(): Assignment {
 
 fun Assignment.toAssignmentEntity(): AssignmentEntity {
     return AssignmentEntity(
+        id = id,
         teacherId = teacherId,
         courseId = courseId,
         assistantId = assistantId,

@@ -6,6 +6,7 @@ import com.msan.ysoftapp.data.mapper.toAssignmentEntity
 import com.msan.ysoftapp.domain.model.Assignment
 import com.msan.ysoftapp.domain.repository.AssignmentRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import java.util.Date
 
@@ -14,8 +15,16 @@ class AssignmentRepositoryImpl(
     private val dao: AssignmentDao
 ) : AssignmentRepository {
 
-    override suspend fun insertAssignment(assignment: Assignment) {
-        dao.insertAssignment(assignment.toAssignmentEntity())
+    override suspend fun insertAssignments(assignments: List<Assignment>): Flow<List<Assignment>> = flow {
+        val savedIds = assignments.map { assignment ->
+                dao.insertAssignment(assignment.toAssignmentEntity())
+        }
+        // Get the saved assignments with their IDs
+        val savedAssignments = assignments.mapIndexed { index, assignment ->
+            assignment.copy(id = savedIds[index])
+        }
+        emit(savedAssignments)
+
     }
 
     override suspend fun deleteAssignment(assignment: Assignment) {

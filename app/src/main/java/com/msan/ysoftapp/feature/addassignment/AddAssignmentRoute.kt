@@ -51,12 +51,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.msan.ysoftapp.R
 import com.msan.ysoftapp.domain.model.Assignment
 import com.msan.ysoftapp.extention.toDate
-import com.msan.ysoftapp.extention.toFormattedDateString
 import com.msan.ysoftapp.extention.toFormattedYearMonthDateString
-import com.msan.ysoftapp.extention.truncateToMidnight
+import com.msan.ysoftapp.feature.addassignment.viewmodel.AddAssignmentViewModel
 import com.msan.ysoftapp.util.Difficulty
 import com.msan.ysoftapp.util.getRecurrenceList
 import java.text.DateFormatSymbols
@@ -68,14 +68,18 @@ import java.util.Locale
 @Composable
 fun AddAssignmentRoute(
     onBackClicked: () -> Unit,
-    navigateToAssignmentConfirm: (Assignment) -> Unit,
-    //viewModel: CalendarViewModel = hiltViewModel()
+    navigateToAssignmentConfirm: (List<Assignment>) -> Unit,
+    viewModel: AddAssignmentViewModel = hiltViewModel()
 ) {
-    AddAssignmentScreen(onBackClicked,navigateToAssignmentConfirm)
+    AddAssignmentScreen(onBackClicked, viewModel, navigateToAssignmentConfirm)
 }
 
 @Composable
-fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: (Assignment) -> Unit) {
+fun AddAssignmentScreen(
+    onBackClicked: () -> Unit,
+    viewModel: AddAssignmentViewModel,
+    navigateToAssignmentConfirm: (List<Assignment>) -> Unit
+) {
     var assignmentName by rememberSaveable { mutableStateOf("") }
     var assignmentDetails by rememberSaveable { mutableStateOf("") }
     var assignmentMarks by rememberSaveable { mutableIntStateOf(3) }
@@ -88,7 +92,9 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: 
 
 
     Column(
-        modifier = Modifier.padding(0.dp, 16.dp).verticalScroll(rememberScrollState()),
+        modifier = Modifier
+            .padding(0.dp, 16.dp)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         FloatingActionButton(
@@ -210,7 +216,8 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: 
                     .weight(1f),
                 selected = difficulty == Difficulty.Moderate,
                 onClick = {
-                    difficulty = if (difficulty == Difficulty.Moderate) null else Difficulty.Moderate
+                    difficulty =
+                        if (difficulty == Difficulty.Moderate) null else Difficulty.Moderate
                     selectedDifficulty = difficulty.toString()
                 },
                 label = { Text(text = Difficulty.Moderate.name) },
@@ -268,7 +275,6 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: 
                 .align(Alignment.CenterHorizontally),
 
 
-
             onClick = {
                 val stringDate = Date().toFormattedYearMonthDateString().toDate()
 
@@ -282,11 +288,17 @@ fun AddAssignmentScreen(onBackClicked: () -> Unit, navigateToAssignmentConfirm: 
                     difficulty = selectedDifficulty,
 
                     onInvalidate = {
-                        Toast.makeText(context, context.getString(R.string.value_is_empty, context.getString(it)), Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.value_is_empty, context.getString(it)),
+                            Toast.LENGTH_LONG
+                        ).show()
                     },
                     onValidate = {
                         navigateToAssignmentConfirm(it)
-                    }
+                    },
+                    viewModel = viewModel
+
                 )
             },
             shape = MaterialTheme.shapes.extraLarge
@@ -317,7 +329,9 @@ fun RecurrenceDropdownMenu(recurrence: (String) -> Unit) {
 
         ExposedDropdownMenuBox(
             expanded = expanded,
-            onExpandedChange = { expanded = !expanded }, // Toggles the dropdown when the box is clicked
+            onExpandedChange = {
+                expanded = !expanded
+            }, // Toggles the dropdown when the box is clicked
         ) {
             TextField(
                 readOnly = true, // Prevent manual text entry
@@ -413,7 +427,6 @@ fun Int.toMonthName(): String {
 }
 
 
-
 private fun validateAssignment(
     assignmentName: String,
     assignmentDetails: String,
@@ -422,8 +435,9 @@ private fun validateAssignment(
     startDate: Date,
     timeAllowed: Int,
     difficulty: String,
+    viewModel: AddAssignmentViewModel,
     onInvalidate: (Int) -> Unit,
-    onValidate: (Assignment) -> Unit,
+    onValidate: (List<Assignment>) -> Unit,
 ) {
     if (assignmentName.isEmpty()) {
         onInvalidate(R.string.assignment_name)
@@ -453,20 +467,18 @@ private fun validateAssignment(
     }
 
 
-    val newAssignment =
-        Assignment(
-            teacherId = 124,
-            courseId = 256,
-            assistantId = 845,
-            name = assignmentName,
-            details = assignmentDetails,
-            marks = assignmentMarks,
-            recurrence = recurrence,
-            startDate = startDate,
-            timeAllowed = timeAllowed,
-            difficulty = difficulty,
+    val assignments =
+        viewModel.createAssignments(
+            assignmentName,
+            assignmentDetails,
+            assignmentMarks,
+            recurrence,
+            startDate,
+            timeAllowed,
+            difficulty
         )
-    onValidate(newAssignment)
+
+    onValidate(assignments)
 }
 
 
@@ -600,7 +612,7 @@ fun ResponsiveRow(
 }
 
 @Composable
-fun AssignmentMarksInput( marks: (Long) -> Unit,) {
+fun AssignmentMarksInput(marks: (Long) -> Unit) {
     var marksText by rememberSaveable { mutableStateOf("") }
 
     Column(
