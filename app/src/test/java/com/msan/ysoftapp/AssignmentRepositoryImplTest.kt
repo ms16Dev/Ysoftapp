@@ -48,7 +48,7 @@ class AssignmentRepositoryImplTest {
             difficulty = "Easy"
         )
 
-        repository.insertAssignment(assignment)
+        repository.insertAssignments(arrayListOf(assignment))
 
         verify(dao).insertAssignment(assignment.toAssignmentEntity())
     }
