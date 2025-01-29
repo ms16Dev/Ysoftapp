@@ -1,9 +1,8 @@
-# Android Project Name
+# Android Sample App
 
-This is an Android sample project for YemenSoft job application. Built using Kotlin, Jetpack Compose, Room & MVVM / DI (Hilt) architecture and follows the latest Android development best practices.
-
+This is an Android sample project for scheduling assignments. Built using Kotlin, Jetpack Compose, Room & MVVM / DI (Hilt) and clean architecture.
 ## Features
-Assignment tracking app with offline data storage (note: no back-end retrieval implemented for the purpose of demonstration)
+Assignment scheduling app with offline data storage, no back-end/full schema implemented for the purpose of demonstration
 
 ## Prerequisites
 
@@ -16,16 +15,15 @@ Assignment tracking app with offline data storage (note: no back-end retrieval i
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/yourusername/your-project.git
+    git clone https://github.com/ms16Dev/Ysoftapp.git
     ```
 
-2. Open the project in Android Studio.
-3. Sync the Gradle files by clicking on "Sync Now" in the top right corner of the screen.
-4. Build and run the project on an emulator or a physical device.
+2. Sync the project.
+3. Build and run.
 
 ## Testing
 
-To run unit tests (data layer only), execute the following from the terminal:
+To run unit tests (data layer only):
 
 ```bash
 ./gradlew test
