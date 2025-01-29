@@ -51,16 +51,19 @@ import java.util.Date
 
 @Composable
 fun HomeRoute(
+    navigateToAssignmentDetail: (Assignment) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel()
-) {
+    viewModel: HomeViewModel = hiltViewModel(),
+    ) {
     val state by viewModel.homeUiState.collectAsState()
     HomeScreen(
         modifier = modifier,
         state = state,
         onDateSelected = viewModel::selectDate,
         onSelectedDate = { viewModel.updateSelectedDate(it) },
-    )
+        navigateToAssignmentDetail = navigateToAssignmentDetail,
+
+        )
 }
 
 @Composable
@@ -69,7 +72,9 @@ fun HomeScreen(
     state: HomeState,
     onDateSelected: (CalendarModel.DateModel) -> Unit,
     onSelectedDate: (Date) -> Unit,
-) {
+    navigateToAssignmentDetail: (Assignment) -> Unit,
+
+    ) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -78,6 +83,8 @@ fun HomeScreen(
             state = state,
             onSelectedDate = onSelectedDate,
             onDateSelected = onDateSelected,
+            navigateToAssignmentDetail = navigateToAssignmentDetail,
+
 
             )
     }
@@ -88,8 +95,10 @@ fun HomeScreen(
 fun DailyAssignments(
     state: HomeState,
     onSelectedDate: (Date) -> Unit,
-    onDateSelected: (CalendarModel.DateModel) -> Unit
-) {
+    onDateSelected: (CalendarModel.DateModel) -> Unit,
+    navigateToAssignmentDetail: (Assignment) -> Unit,
+
+    ) {
 
     DatesHeader(
         lastSelectedDate = state.lastSelectedDate,
@@ -112,7 +121,10 @@ fun DailyAssignments(
                 items = state.assignments,
                 itemContent = {
                     AssignmentCard(
-                        assignment = it
+                        assignment = it,
+                        navigateToAssignmentDetail = { assignment ->
+                            navigateToAssignmentDetail(assignment)
+                        }
                     )
                 }
             )
@@ -123,13 +135,16 @@ fun DailyAssignments(
 
 
 @Composable
-fun AssignmentCard(assignment: Assignment) {
+fun AssignmentCard(assignment: Assignment,
+   navigateToAssignmentDetail: (Assignment) -> Unit
+) {
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
             .padding(vertical = 8.dp),
+        onClick = { navigateToAssignmentDetail(assignment) },
         shape = RoundedCornerShape(30.dp),
         colors = cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,

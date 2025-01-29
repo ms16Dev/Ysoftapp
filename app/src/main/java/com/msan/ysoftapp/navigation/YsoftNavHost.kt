@@ -8,13 +8,13 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.msan.ysoftapp.domain.model.Assignment
 import com.msan.ysoftapp.feature.addassignment.navigation.addAssignmentGraph
-import com.msan.ysoftapp.feature.assignmentconfirm.AssignmentConfirmRoute
 import com.msan.ysoftapp.feature.assignmentconfirm.navigation.ASSIGNMENT
 import com.msan.ysoftapp.feature.assignmentconfirm.navigation.AssignmentConfirmDestination
 import com.msan.ysoftapp.feature.assignmentconfirm.navigation.assignmentConfirmGraph
-import com.msan.ysoftapp.feature.calendar.navegation.calendarGraph
+import com.msan.ysoftapp.feature.assignmentdetail.AssignmentDetailDestination
+import com.msan.ysoftapp.feature.assignmentdetail.assignmentDetailGraph
+import com.msan.ysoftapp.feature.history.navegation.historyGraph
 import com.msan.ysoftapp.feature.home.navigation.HomeDestination
 import com.msan.ysoftapp.feature.home.navigation.homeGraph
 import java.util.ArrayList
@@ -33,8 +33,30 @@ fun YsoftNavHost(
         startDestination = startDestination,
         modifier = modifier,
     ) {
-        homeGraph(bottomBarVisibility, fabVisibility)
-        calendarGraph(bottomBarVisibility, fabVisibility)
+        homeGraph(
+            navController = navController,
+            bottomBarVisibility = bottomBarVisibility,
+            fabVisibility = fabVisibility,
+            navigateToAssignmentDetail = { medication ->
+                navController.navigate(
+                    AssignmentDetailDestination.createNavigationRoute(medication.id)
+                )
+            }
+        )
+        historyGraph(
+            bottomBarVisibility = bottomBarVisibility,
+            fabVisibility = fabVisibility,
+            navigateToMedicationDetail = { medication ->
+                navController.navigate(
+                    AssignmentDetailDestination.createNavigationRoute(medication.id)
+                )
+            }
+        )
+        assignmentDetailGraph(
+            bottomBarVisibility = bottomBarVisibility,
+            fabVisibility = fabVisibility,
+            onBackClicked = { navController.navigateUp() }
+        )
         addAssignmentGraph(
             navController = navController,
             bottomBarVisibility,

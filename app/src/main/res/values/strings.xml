@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Ysoftapp</string>
     <string name="home">Home</string>
-    <string name="calendar">Calendar</string>
+    <string name="history">History</string>
     <string name="add_assignment">Add Assignment</string>
     <string name="assignment_name">Assignment Name</string>
     <string name="assignment_marks">Marks</string>
@@ -20,5 +20,8 @@
     <string name="home_screen_empty_card_message">No Assignments schedualed for this date. Take a break :)</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="no_history_yet">No history yet!</string>
+    <string name="skipped">Skipped</string>
+    <string name="back">Back</string>
 
 </resources>

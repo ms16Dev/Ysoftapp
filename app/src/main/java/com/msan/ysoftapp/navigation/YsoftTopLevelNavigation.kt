@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.msan.ysoftapp.R
-import com.msan.ysoftapp.feature.calendar.navegation.CalendarDestination
+import com.msan.ysoftapp.feature.history.navegation.HistoryDestination
 import com.msan.ysoftapp.feature.home.navigation.HomeDestination
 
 class YsoftTopLevelNavigation(private val navController: NavHostController) {
@@ -47,9 +47,9 @@ val TOP_LEVEL_DESTINATIONS = listOf(
         iconTextId = R.string.home
     ),
     TopLevelDestination(
-        route = CalendarDestination.route,
+        route = HistoryDestination.route,
         selectedIcon = Icons.Filled.DateRange,
         unselectedIcon = Icons.Outlined.DateRange,
-        iconTextId = R.string.calendar
+        iconTextId = R.string.history
     ),
 )
